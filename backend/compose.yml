@@ -1,0 +1,15 @@
+services:
+  backend:
+    build: .
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - stt-data:/app/data
+      - stt-models:/app/models
+    gpus: all
+    restart: unless-stopped
+
+volumes:
+  stt-data:
+  stt-models:
