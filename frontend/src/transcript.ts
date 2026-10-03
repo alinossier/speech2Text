@@ -1,6 +1,6 @@
 import type { Segment } from './api'
 
-export const TIMESTAMP_INTERVALS = [30, 60, 120, 300] as const
+export const TIMESTAMP_INTERVALS = [0, 30, 60, 120, 300] as const
 export const DEFAULT_TIMESTAMP_INTERVAL = 60
 
 export type TranscriptBlock = {
@@ -14,10 +14,12 @@ export function groupTranscript(segments: Segment[], intervalSeconds: number): T
   let nextTimestamp = -Infinity
 
   for (const segment of segments) {
-    const timed = segment.startSeconds >= nextTimestamp
+    const previous = blocks[blocks.length - 1]
+    const timed = intervalSeconds === 0
+      ? !previous || previous.speakerId !== segment.speakerId
+      : segment.startSeconds >= nextTimestamp
     if (timed) nextTimestamp = segment.startSeconds + intervalSeconds
 
-    const previous = blocks[blocks.length - 1]
     if (previous && previous.speakerId === segment.speakerId && !timed) {
       previous.text += ` ${segment.text}`
     } else {

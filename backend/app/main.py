@@ -146,7 +146,7 @@ def update_speaker(job_id: str, speaker_id: str, payload: SpeakerRename):
 
 
 @app.get("/api/jobs/{job_id}/export/{format_name}")
-def export_transcript(job_id: str, format_name: str, timestamp_interval_seconds: int = Query(default=60, ge=1, le=3600)):
+def export_transcript(job_id: str, format_name: str, timestamp_interval_seconds: int = Query(default=60, ge=0, le=3600)):
     job = database.get_job(job_id)
     if not job or job["status"] != "completed":
         raise HTTPException(404, "Completed transcript not found.")

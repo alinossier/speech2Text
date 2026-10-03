@@ -65,4 +65,4 @@ export const listJobs = () => request<Job[]>('/api/jobs')
 export const renameSpeaker = (jobId: string, speakerId: string, name: string) => request<Job>(`/api/jobs/${jobId}/speakers/${speakerId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) })
 export const deleteJob = (id: string) => request<void>(`/api/jobs/${id}`, { method: 'DELETE' })
 export const exportUrl = (id: string, format: 'txt' | 'srt', intervalSeconds?: number) =>
-  `${baseUrl}/api/jobs/${id}/export/${format}${format === 'txt' && intervalSeconds ? `?timestamp_interval_seconds=${intervalSeconds}` : ''}`
+  `${baseUrl}/api/jobs/${id}/export/${format}${format === 'txt' && intervalSeconds !== undefined ? `?timestamp_interval_seconds=${intervalSeconds}` : ''}`

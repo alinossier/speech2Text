@@ -26,4 +26,4 @@ Open `http://localhost:8080`. The backend API is available on `http://localhost:
 
 Completed uploads are deleted automatically from the backend. Transcript data remains until the user deletes it from the UI.
 
-In a completed transcript, use **Show timestamps every** to choose the spacing for the on-screen transcript, copied text, and TXT download. The choice is saved in the browser. SRT downloads retain a timestamp for each caption.
+In a completed transcript, use **Show timestamps every** to choose the spacing for the on-screen transcript, copied text, and TXT download. Choose **speaker turn** to timestamp each change of speaker. The choice is saved in the browser. SRT downloads retain a timestamp for each caption.

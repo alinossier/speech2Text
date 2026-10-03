@@ -23,6 +23,14 @@ class TranscriptFormatTests(unittest.TestCase):
             (None, "B", "Yes. Later again."),
         ])
 
+        self.assertEqual(group_transcript(segments + [
+            {"start_seconds": 80, "speaker_id": "A", "text": "Back."},
+        ], 0), [
+            (0, "A", "Hello world."),
+            (20, "B", "Yes. Later again."),
+            (80, "A", "Back."),
+        ])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -27,8 +27,8 @@ export function App() {
   const [recent, setRecent] = useState<Job[]>([])
   const [upload, setUpload] = useState<{ filename: string; loaded: number; total: number } | null>(null)
   const [timestampInterval, setTimestampInterval] = useState<number>(() => {
-    const saved = Number(window.localStorage.getItem('timestampIntervalSeconds'))
-    return TIMESTAMP_INTERVALS.find((interval) => interval === saved) ?? DEFAULT_TIMESTAMP_INTERVAL
+    const saved = window.localStorage.getItem('timestampIntervalSeconds')
+    return saved === null ? DEFAULT_TIMESTAMP_INTERVAL : TIMESTAMP_INTERVALS.find((interval) => interval === Number(saved)) ?? DEFAULT_TIMESTAMP_INTERVAL
   })
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -135,12 +135,11 @@ function TranscriptView({ job, error, timestampInterval, onTimestampIntervalChan
   const pending = job.status === 'queued' || job.status === 'processing'
   const blocks = groupTranscript(job.segments ?? [], timestampInterval)
   return <section className="transcript-shell">
-    <div className="job-header"><div><div className="eyebrow">{job.filename}</div><h1>{statusText(job.status)}</h1></div><div className={`status ${job.status}`}>{pending && <LoaderCircle size={15} className="spin" />}{job.status === 'completed' && <Check size={15} />}{statusText(job.status)}</div></div>
+    <div className="job-header"><div><div className="eyebrow">{job.filename}</div><h1>{statusText(job.status)}</h1>{job.status === 'completed' && <p className="privacy-note">Source audio deleted</p>}</div><div className={`status ${job.status}`}>{pending && <LoaderCircle size={15} className="spin" />}{job.status === 'completed' && <Check size={15} />}{statusText(job.status)}</div></div>
     {pending && <div className="processing"><LoaderCircle size={24} className="spin" /><div><strong>{job.status === 'queued' ? 'Waiting for the GPU worker' : 'Transcribing and separating speakers'}</strong><p>The source file will be permanently deleted when processing ends.</p></div></div>}
     {job.status === 'failed' && <div className="error"><strong>Processing failed.</strong> {job.error}</div>}
     {job.status === 'completed' && <>
-      <div className="transcript-toolbar"><span className="privacy-note">Source audio deleted</span><div className="actions"><button className="icon-button" onClick={onCopy} title="Copy transcript"><Copy size={18} /></button><a className="icon-button" href={exportUrl(job.id, 'txt', timestampInterval)} title="Download TXT"><Download size={18} /></a><a className="icon-button" href={exportUrl(job.id, 'srt')} title="Download SRT"><span className="srt">SRT</span></a><button className="icon-button danger" onClick={onDelete} title="Delete transcript"><Trash2 size={18} /></button></div></div>
-      <div className="transcript-settings"><label htmlFor="timestamp-interval">Show timestamps every</label><select id="timestamp-interval" value={timestampInterval} onChange={(event) => onTimestampIntervalChange(Number(event.target.value))}><option value={30}>30 seconds</option><option value={60}>1 minute</option><option value={120}>2 minutes</option><option value={300}>5 minutes</option></select></div>
+      <div className="transcript-toolbar"><div className="transcript-settings"><label htmlFor="timestamp-interval">Show timestamps every</label><select id="timestamp-interval" value={timestampInterval} onChange={(event) => onTimestampIntervalChange(Number(event.target.value))}><option value={0}>speaker turn</option><option value={30}>30 seconds</option><option value={60}>1 minute</option><option value={120}>2 minutes</option><option value={300}>5 minutes</option></select></div><div className="actions"><button className="icon-button" onClick={onCopy} title="Copy transcript"><Copy size={18} /></button><a className="icon-button" href={exportUrl(job.id, 'txt', timestampInterval)} title="Download TXT"><Download size={18} /></a><a className="icon-button" href={exportUrl(job.id, 'srt')} title="Download SRT"><span className="srt">SRT</span></a><button className="icon-button danger" onClick={onDelete} title="Delete transcript"><Trash2 size={18} /></button></div></div>
       <div className="speaker-list">{Object.entries(job.speakers).map(([id, name]) => <button key={id} className="speaker-button" onClick={() => onRename(id, name)} title="Rename speaker"><UserRound size={15} />{name}</button>)}</div>
       <div className="transcript">{blocks.map((block, index) => <article className="turn" key={index}>{block.startSeconds === null ? <span className="timestamp-spacer" aria-hidden="true" /> : <time>{prettyTime(block.startSeconds)}</time>}<div><button className="speaker-name" onClick={() => onRename(block.speakerId, job.speakers[block.speakerId] || block.speakerId)}>{job.speakers[block.speakerId] || block.speakerId}</button><p>{block.text}</p></div></article>)}</div>
     </>}

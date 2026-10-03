@@ -25,4 +25,12 @@ describe('groupTranscript', () => {
   it('handles an empty transcript', () => {
     expect(groupTranscript([], 60)).toEqual([])
   })
+
+  it('shows a timestamp at each speaker turn without splitting the same speaker', () => {
+    expect(groupTranscript([...segments, { startSeconds: 80, endSeconds: 85, speakerId: 'A', text: 'Back.' }], 0)).toEqual([
+      { startSeconds: 0, speakerId: 'A', text: 'Hello world.' },
+      { startSeconds: 20, speakerId: 'B', text: 'Yes. Later again.' },
+      { startSeconds: 80, speakerId: 'A', text: 'Back.' },
+    ])
+  })
 })

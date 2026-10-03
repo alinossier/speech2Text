@@ -4,7 +4,7 @@ def group_transcript(segments, interval_seconds: int) -> list[tuple[float | None
     for segment in segments:
         start = segment["start_seconds"]
         speaker_id = segment["speaker_id"]
-        timed = start >= next_timestamp
+        timed = (not blocks or blocks[-1][1] != speaker_id) if interval_seconds == 0 else start >= next_timestamp
         if timed:
             next_timestamp = start + interval_seconds
         if blocks and blocks[-1][1] == speaker_id and not timed:
